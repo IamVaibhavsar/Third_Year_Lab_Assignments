@@ -1,0 +1,362 @@
+Name    : Vaibhav Bhavsar
+Class   : TE-B
+Roll No : 08
+===============================================================================================
+
+  Assignment no:3
+-----------------------------------------------------------------------------------------------
+Consider the given Database Schema:
+
+	employee (employee-name, street, city)
+	works (employee-name, company-name, salary)
+	company (company-name, city)
+	manages (employee-name, manager-name)
+
+1. Find the names of all employees who work for First Bank Corporation.
+2. Find the names and cities of residence of all employees who work for First Bank Corporation.
+3. Find the names, street addresses, and cities of residence of all employees
+   who work for First Bank Corporation and earn more than $10,000.
+4. Find all employees in the database who live in the same cities as the companies for which     
+   they work.
+5. Find all employees in the database who live in the same cities and on the
+   same streets as do their managers.
+6. Find all employees in the database who do not work for First Bank Corporation.
+7. Find all employees in the database who earn more than each employee ofSmall Bank Corporation.
+8. Assume that the companies may be located in several cities. Find all companies loacted in     
+   every city in which Small Bank Corporation is located.
+9. Find all employees who earn more than the average salary of all employees of their company.
+10. Find the company that has the most employees.
+11. Find the company that has the smallest payroll.
+12. Find those companies whose employees earn a higher salary, on average, than the average salary at First Bank Corporation. 
+
+Software Required: MySQL ,Ubuntu      
+
+================================================================================================
+
+#DISPLAYING ALL TABLES
+
+mysql> show tables;
++-----------------+
+| Tables_in_data3 |
++-----------------+
+| company         |
+| employee        |
+| manager         |
+| works           |
++-----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc company;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| company_name | varchar(100) | NO   | PRI | NULL    |       |
+| city         | varchar(20)  | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc employee;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| person_name | varchar(100) | NO   | PRI | NULL    |       |
+| street      | varchar(50)  | YES  |     | NULL    |       |
+| city        | varchar(20)  | YES  |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc manager;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| person_name  | varchar(100) | YES  | MUL | NULL    |       |
+| manager_name | varchar(50)  | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc works;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| person_name  | varchar(100) | YES  | MUL | NULL    |       |
+| company_name | varchar(100) | YES  | MUL | NULL    |       |
+| salary       | int(11)      | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+
+mysql> select *from employee;
++-------------------+--------------+--------------+
+| person_name       | street       | city         |
++-------------------+--------------+--------------+
+| Amy Baker         | Sixth Street | Pennsylvania |
+| Daniff Hernandez  | Oak Street   | New York     |
+| Janet King        | Elm Street   | Illinois     |
+| Jayne Horton      | Ceder Street | New York     |
+| Mia Brown         | Park Street  | Florida      |
+| Nan Singh         | Fifth Street | Ohio         |
+| Renee Becker      | View Street  | Florida      |
+| Smith Leighann    | Sixth Street | New York     |
+| William LaRotonda | Pine Street  | Ohio         |
++-------------------+--------------+--------------+
+9 rows in set (0.00 sec)
+
+
+mysql> select *from manager;
++-------------------+----------------+
+| person_name       | manager_name   |
++-------------------+----------------+
+| Amy Baker         | Elisa Bramante |
+| William LaRotonda | Michael Albert |
+| Renee Becker      | Elijiah Gray   |
+| Nan Singh         | Amy Dunn       |
+| Janet King        | Kelley Spirea  |
+| Mia Brown         | David Stanley  |
+| Smith Leighann    | John Harison   |
++-------------------+----------------+
+7 rows in set (0.00 sec)
+
+
+mysql> select *from company;
++--------------------------+--------------+
+| company_name             | city         |
++--------------------------+--------------+
+| AmerisourcBergen         | Pennsylvania |
+| Discover Finances        | Illinois     |
+| NextEra energy           | Florida      |
+| Penske Automotive groups | New York     |
+| PepsiCo                  | New York     |
+| Progressive              | Ohio         |
+| US Foods                 | Illinois     |
++--------------------------+--------------+
+7 rows in set (0.00 sec)
+
+
+mysql> select *from works;
++-------------------+--------------------------+--------+
+| person_name       | company_name             | salary |
++-------------------+--------------------------+--------+
+| Amy Baker         | AmerisourcBergen         | 120000 |
+| William LaRotonda | Progressive              | 150000 |
+| Smith Leighann    | PepsiCo                  | 120000 |
+| Daniff Hernandez  | Penske Automotive groups | 140000 |
+| Janet King        | US Foods                 | 125000 |
+| Jayne Horton      | Penske Automotive groups | 205000 |
+| Mia Brown         | NextEra energy           | 105000 |
+| Nan Singh         | Progressive              | 255000 |
+| Renee Becker      | NextEra energy           | 145000 |
++-------------------+--------------------------+--------+
+9 rows in set (0.00 sec)
+
+==============================================================================================
+1. Find the names of all employees who work for NextEra energy.
+
+==============================================================================================
+
+mysql> Select person_name from works Where company_name="NextEra energy";
++--------------+
+| person_name  |
++--------------+
+| Mia Brown    |
+| Renee Becker |
++--------------+
+2 rows in set (0.04 sec)
+
+=============================================================================================
+2. Find the names and cities of residence of all employees who work for Progressive.
+
+=============================================================================================
+mysql> select * from employee where person_name in (select person_name from works where company_name="Progressive");
++-------------------+--------------+------+
+| person_name       | street       | city |
++-------------------+--------------+------+
+| William LaRotonda | Pine Street  | Ohio |
+| Nan Singh         | Fifth Street | Ohio |
++-------------------+--------------+------+
+2 rows in set (0.03 sec)
+
+===============================================================================================
+3. Find the names, street addresses, and cities of residence of all employees
+   who work for Progressive and earn more than $10,000.
+
+===============================================================================================
+
+mysql> select * from employee where person_name in (select person_name from works where company_name="Progressive" and salary>150000);
++-------------+--------------+------+
+| person_name | street       | city |
++-------------+--------------+------+
+| Nan Singh   | Fifth Street | Ohio |
++-------------+--------------+------+
+1 row in set (0.00 sec)
+
+
+mysql> 
+select E.person_name, street, city from employee as E, works as W where E.person_name=W.person_name and W.company_name="Progressive"  and W.salary>10000;
++-------------------+--------------+------+
+| person_name       | street       | city |
++-------------------+--------------+------+
+| William LaRotonda | Pine Street  | Ohio |
+| Nan Singh         | Fifth Street | Ohio |
++-------------------+--------------+------+
+2 rows in set (0.00 sec)
+
+===============================================================================================
+4. Find all employees in the database who live in the same cities as the companies for which     
+   they work.
+
+===============================================================================================
+mysql> 
+select E.person_name 
+from employee as E, works as W, company as C 
+where E.person_name=W.person_name and 
+E.city=C.city and 
+W.company_name=C.company_name;
++-------------------+
+| person_name       |
++-------------------+
+| Amy Baker         |
+| William LaRotonda |
+| Smith Leighann    |
+| Daniff Hernandez  |
+| Janet King        |
+| Jayne Horton      |
+| Mia Brown         |
+| Nan Singh         |
+| Renee Becker      |
++-------------------+
+9 rows in set (0.00 sec)
+
+===============================================================================================
+5. Find all employees in the database who live in the same cities and on the
+   same streets as do their managers.
+===============================================================================================
+ 
+mysql> 
+Select E1.person_name 
+From employee as E1, employee as E2, manager as M 
+Where E1.person_name=M.person_name and 
+E2.person_name=M.manager_name and E1.street=E2.street and E1.city=E2.city;
+Empty set (0.03 sec)
+
+===============================================================================================
+6. Find all employees in the database who do not work for Progressive.
+
+================================================================================================
+mysql> 
+select person_name from works where company_name <> "Progressive";
++------------------+
+| person_name      |
++------------------+
+| Amy Baker        |
+| Smith Leighann   |
+| Daniff Hernandez |
+| Janet King       |
+| Jayne Horton     |
+| Mia Brown        |
+| Renee Becker     |
++------------------+
+7 rows in set (0.03 sec)
+
+===============================================================================================
+7. Find all employees in the database who earn more than each employee of Penske Automotive groups.
+
+===============================================================================================
+ 
+mysql> 
+select person_name from works where salary >
+(select max(salary) from works where company_name="NextEra energy");
++-------------------+
+| person_name       |
++-------------------+
+| William LaRotonda |
+| Jayne Horton      |
+| Nan Singh         |
++-------------------+
+3 rows in set (0.05 sec)
+
+===============================================================================================
+8. Assume that the companies may be located in several cities. Find all companies loacted in     
+   every city in which Progressive is located.
+
+===============================================================================================
+mysql> select T.company_name from company T where T.city in(select city from company where company_name="Progressive");
++--------------+
+| company_name |
++--------------+
+| Progressive  |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> 
+select T.company_name 
+from company T 
+where T.city in(select city from company where company_name="PepsiCo");
++--------------------------+
+| company_name             |
++--------------------------+
+| Penske Automotive groups |
+| PepsiCo                  |
++--------------------------+
+2 rows in set (0.00 sec)
+
+
+===============================================================================================
+9. Find all employees who earn more than the average salary of all employees of their company.
+
+===============================================================================================
+mysql> select person_name 
+from works as t where salary >
+(select avg(salary) from works as s 
+where t.company_name = s.company_name);
++--------------+
+| person_name  |
++--------------+
+| Jayne Horton |
+| Nan Singh    |
+| Renee Becker |
++--------------+
+3 rows in set (0.00 sec)
+
+===============================================================================================
+10. Find the company that has the most employees.
+
+===============================================================================================
+
+mysql> select company_name from works group by company_name having count(distinct person_name)>=all ( select count(distinct person_name) from works group by company_name);
++--------------------------+
+| company_name             |
++--------------------------+
+| NextEra energy           |
+| Penske Automotive groups |
+| Progressive              |
++--------------------------+
+3 rows in set (0.02 sec)
+
+===============================================================================================
+11. Find the company that has the smallest payroll.
+
+===============================================================================================
+mysql> select company_name from works group by company_name having sum(salary) <= all (select sum(salary) from works group by company_name);
++------------------+
+| company_name     |
++------------------+
+| AmerisourcBergen |
+| PepsiCo          |
++------------------+
+2 rows in set (0.00 sec)
+
+==============================================================================================
+12. Find those companies whose employees earn a higher salary, on average, than the average salary at NextEra energy.
+
+==============================================================================================
+
+mysql> select company_name from works group by company_name having avg(salary)>(select avg(salary) from works where company_name="NextEra energy");
++--------------------------+
+| company_name             |
++--------------------------+
+| Penske Automotive groups |
+| Progressive              |
++--------------------------+
+2 rows in set (0.00 sec)
+
+===============================================================================================

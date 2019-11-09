@@ -1,0 +1,474 @@
+Name    : Vaibhav Bhavsar
+Class   : TE-B
+Roll No : 08
+====================================================================================================================
+
+Assignment : 2
+--------------------------------------------------------------------------------------------------------------------
+
+Account(Acc_no,Branch_Name,Balance)
+Branch(Branch_Name,Branch_City,Assets)
+Customer(Cust_Name,Cust_Street,Cust_City)
+Depositor(Cust_Name,Acc_No)
+Loan(Loan_No,Branch_Name,Amount)
+Borrower(Cust_Name,Loan_No)
+
+====================================================================================================================
+
++-----------------+
+| Tables_in_DBMSL |
++-----------------+
+| Account         |
+| Borrower        |
+| Branch          |
+| Customer        |
+| Depositor       |
+| Loan            |
++-----------------+
+
+mysql> select* from Branch;
++-----------------+-------------+--------+
+| Branch_Name     | Branch_City | Assets |
++-----------------+-------------+--------+
+| College Road    | Nasik       | aaa    |
+| Gangapur Road   | Nasik       | aaa    |
+| Indira Nagar    | Nasik       | aaa    |
+| Nasik Road      | Nasik       | aaa    |
+| Ravivar Karanja | Nasik       | aaa    |
+| Sharanpur Road  | Nasik       | aaa    |
++-----------------+-------------+--------+
+
+mysql> select* from Account;
++--------+-----------------+---------+
+| Acc_No | Branch_Name     | Balance |
++--------+-----------------+---------+
+|   1001 | Gangapur Road   | 1010.55 |
+|   1004 | Sharanpur Road  |  310.55 |
+|   1022 | Gangapur Road   | 2400.88 |
+|   1043 | Gangapur Road   | 23780.3 |
+|   1057 | Ravivar Karanja | 23260.6 |
+|   1060 | Sharanpur Road  |  560.55 |
+|   1066 | Sharanpur Road  | 11560.5 |
+|   1290 | Ravivar Karanja |  760.55 |
+|   1330 | Indira Nagar    |  560.55 |
+|   1400 | Gangapur Road   |  760.55 |
++--------+-----------------+---------+
+
+mysql> select* from Customer;
++------------+---------------+-----------+
+| Cust_Name  | Cust_Street   | Cust_City |
++------------+---------------+-----------+
+| Ankita     | Deolali Camp  | Nasik     |
+| Atharva    | Gangapur Road | Nasik     |
+| Durgesh    | Pavan Nagar   | Nasik     |
+| Harsha     | Canada Corner | Nasik     |
+| Ojaswini   | College Road  | Nasik     |
+| Sharvari   | Golf club     | Nasik     |
+| Shreya     | Indira Nagar  | Nasik     |
+| Uddesh     | Amrutdham     | Nasik     |
+| Varun      | Trimbak Road  | Nasik     |
+| Yashashree | Rane Nagar    | Nasik     |
++------------+---------------+-----------+
+
+mysql> select* from Depositor;
++------------+--------+
+| Cust_Name  | Acc_No |
++------------+--------+
+| Atharva    |   1001 |
+| Uddesh     |   1004 |
+| Sharvari   |   1060 |
+| Ankita     |   1290 |
+| Yashashree |   1330 |
+| Ojaswini   |   1400 |
+| Durgesh    |   1022 |
+| Harsha     |   1043 |
+| Shreya     |   1057 |
+| Varun      |   1066 |
++------------+--------+
+
+mysql> select* from Loan;
++---------+-----------------+--------+
+| Loan_No | Branch_Name     | Amount |
++---------+-----------------+--------+
+|       1 | Gangapur Road   |   1000 |
+|       2 | Sharanpur Road  |   2000 |
+|       3 | Ravivar Karanja |   2800 |
+|       4 | Gangapur Road   |  10000 |
+|       5 | Ravivar Karanja |   5000 |
+|       6 | Gangapur Road   |   2500 |
++---------+-----------------+--------+
+
+mysql> select* from Borrower;
++-----------+---------+
+| Cust_Name | Loan_No |
++-----------+---------+
+| Ankita    |       3 |
+| Sharvari  |       2 |
+| Atharva   |       1 |
+| Harsha    |       4 |
+| Shreya    |       5 |
+| Ojaswini  |       6 |
++-----------+---------+
+
+====================================================================================================
+
+1. Find the names of all branches in loan relation.
+---------------------------------------------------
+
+mysql> select Branch_Name from Loan;
++-----------------+
+| Branch_Name     |
++-----------------+
+| Gangapur Road   |
+| Gangapur Road   |
+| Gangapur Road   |
+| Ravivar Karanja |
+| Ravivar Karanja |
+| Sharanpur Road  |
++-----------------+
+
+====================================================================================================
+
+2.Find all loan numbers for loans made at Shivaji nagar Branch with loan amount > 1500.
+---------------------------------------------------------------------------------------
+
+mysql> select Loan_No from Loan where Branch_Name='Gangapur Road' and Amount>1500;
++---------+
+| Loan_No |
++---------+
+|       4 |
+|       6 |
++---------+
+
+====================================================================================================
+
+3. Find all customers who have a loan from bank. Find their names,loan_no and loan amount.
+------------------------------------------------------------------------------------------
+
+mysql> select Loan.Loan_No,Cust_Name,Amount from Loan,Borrower where Loan.Loan_No=Borrower.Loan_No;
++---------+-----------+--------+
+| Loan_No | Cust_Name | Amount |
++---------+-----------+--------+
+|       1 | Atharva   |   1000 |
+|       2 | Sharvari  |   2000 |
+|       3 | Ankita    |   2800 |
+|       4 | Harsha    |  10000 |
+|       5 | Shreya    |   5000 |
+|       6 | Ojaswini  |   2500 |
++---------+-----------+--------+
+
+====================================================================================================
+
+4. List all customers in alphabetical order who have loan from Shivaji nagar branch.
+------------------------------------------------------------------------------------
+
+mysql> select Loan.Loan_No,Cust_Name,Amount from Loan,Borrower where Loan.Loan_No=Borrower.Loan_No and Branch_Name='Gangapur Road' order by Cust_Name asc;
++---------+-----------+--------+
+| Loan_No | Cust_Name | Amount |
++---------+-----------+--------+
+|       1 | Atharva   |   1000 |
+|       4 | Harsha    |  10000 |
+|       6 | Ojaswini  |   2500 |
++---------+-----------+--------+
+
+====================================================================================================
+
+5. Find all customers who have an account or loan or both at bank.
+------------------------------------------------------------------
+
+mysql> select Cust_Name from Borrower union select Cust_Name from Depositor;
++------------+
+| Cust_Name  |
++------------+
+| Ankita     |
+| Atharva    |
+| Harsha     |
+| Ojaswini   |
+| Sharvari   |
+| Shreya     |
+| Durgesh    |
+| Uddesh     |
+| Varun      |
+| Yashashree |
++------------+
+
+====================================================================================================
+
+6. Find all customers who have both account and loan at bank.
+-------------------------------------------------------------
+
+mysql> select Cust_Name from Borrower where Cust_Name in(select Cust_Name from Depositor);
++-----------+
+| Cust_Name |
++-----------+
+| Ankita    |
+| Atharva   |
+| Harsha    |
+| Ojaswini  |
+| Sharvari  |
+| Shreya    |
++-----------+
+
+====================================================================================================
+
+7. Find all customer who have account but no loan at the bank.
+--------------------------------------------------------------
+
+mysql> select Cust_Name from Depositor where Cust_Name not in(select Cust_Name from Borrower);
++------------+
+| Cust_Name  |
++------------+
+| Durgesh    |
+| Uddesh     |
+| Varun      |
+| Yashashree |
++------------+
+
+====================================================================================================
+
+8. Find average account balance at Shivaji nagar branch.
+--------------------------------------------------------
+
+mysql> select Branch_Name,avg(Balance) from Account where Branch_Name='Gangapur Road';
++---------------+-------------------+
+| Branch_Name   | avg(Balance)      |
++---------------+-------------------+
+| Gangapur Road | 6988.067230224609 |
++---------------+-------------------+
+
+====================================================================================================
+
+9. Find the average account balance at each branch
+--------------------------------------------------
+
+mysql> select Branch_Name,avg(Balance) from Account group by Branch_Name;
++-----------------+--------------------+
+| Branch_Name     | avg(Balance)       |
++-----------------+--------------------+
+| Gangapur Road   |  6988.067230224609 |
+| Indira Nagar    |  560.5499877929688 |
+| Ravivar Karanja | 12010.550384521484 |
+| Sharanpur Road  | 4143.8832600911455 |
++-----------------+--------------------+
+
+====================================================================================================
+
+10. Find no. of depositors at each branch.
+------------------------------------------
+
+mysql> select Branch_Name,count(Account.Acc_No) from Depositor,Account where Depositor.Acc_No=Account.Acc_No group by Branch_Name;
++-----------------+-----------------------+
+| Branch_Name     | count(Account.Acc_No) |
++-----------------+-----------------------+
+| Gangapur Road   |                     4 |
+| Indira Nagar    |                     1 |
+| Ravivar Karanja |                     2 |
+| Sharanpur Road  |                     3 |
++-----------------+-----------------------+
+
+====================================================================================================
+
+11. Find the branches where average account balance > 1000.
+-----------------------------------------------------------
+
+mysql> select Branch_Name,avg(Balance) from Account group by Branch_Name having avg(Balance)>1000.0;
++-----------------+--------------------+
+| Branch_Name     | avg(Balance)       |
++-----------------+--------------------+
+| Gangapur Road   |  6988.067230224609 |
+| Ravivar Karanja | 12010.550384521484 |
+| Sharanpur Road  | 4143.8832600911455 |
++-----------------+--------------------+
+
+====================================================================================================
+
+12. Find number of tuples in customer relation.
+-----------------------------------------------
+
+mysql> select count(*) from Customer;
++----------+
+| count(*) |
++----------+
+|       10 |
++----------+
+
+====================================================================================================
+
+13. Calculate total loan amount given by bank.
+----------------------------------------------
+
+mysql> select sum(Amount) from Loan;
++-------------+
+| sum(Amount) |
++-------------+
+|       23300 |
++-------------+
+
+====================================================================================================
+
+14. Delete all loans with loan amount between 1300 and 1500.
+------------------------------------------------------------
+
+mysql> delete from Loan where Amount>900 and Amount<2500;
+
+mysql> select* from Branch;
++-----------------+-------------+--------+
+| Branch_Name     | Branch_City | Assets |
++-----------------+-------------+--------+
+| College Road    | Nasik       | aaa    |
+| Gangapur Road   | Nasik       | aaa    |
+| Indira Nagar    | Nasik       | aaa    |
+| Nasik Road      | Nasik       | aaa    |
+| Ravivar Karanja | Nasik       | aaa    |
+| Sharanpur Road  | Nasik       | aaa    |
++-----------------+-------------+--------+
+
+mysql> select* from Account;
++--------+-----------------+---------+
+| Acc_No | Branch_Name     | Balance |
++--------+-----------------+---------+
+|   1001 | Gangapur Road   | 1010.55 |
+|   1004 | Sharanpur Road  |  310.55 |
+|   1022 | Gangapur Road   | 2400.88 |
+|   1043 | Gangapur Road   | 23780.3 |
+|   1057 | Ravivar Karanja | 23260.6 |
+|   1060 | Sharanpur Road  |  560.55 |
+|   1066 | Sharanpur Road  | 11560.5 |
+|   1290 | Ravivar Karanja |  760.55 |
+|   1330 | Indira Nagar    |  560.55 |
+|   1400 | Gangapur Road   |  760.55 |
++--------+-----------------+---------+
+
+mysql> select* from Customer;
++------------+---------------+-----------+
+| Cust_Name  | Cust_Street   | Cust_City |
++------------+---------------+-----------+
+| Ankita     | Deolali Camp  | Nasik     |
+| Atharva    | Gangapur Road | Nasik     |
+| Durgesh    | Pavan Nagar   | Nasik     |
+| Harsha     | Canada Corner | Nasik     |
+| Ojaswini   | College Road  | Nasik     |
+| Sharvari   | Golf club     | Nasik     |
+| Shreya     | Indira Nagar  | Nasik     |
+| Uddesh     | Amrutdham     | Nasik     |
+| Varun      | Trimbak Road  | Nasik     |
+| Yashashree | Rane Nagar    | Nasik     |
++------------+---------------+-----------+
+
+mysql> select* from Depositor;
++------------+--------+
+| Cust_Name  | Acc_No |
++------------+--------+
+| Atharva    |   1001 |
+| Uddesh     |   1004 |
+| Sharvari   |   1060 |
+| Ankita     |   1290 |
+| Yashashree |   1330 |
+| Ojaswini   |   1400 |
+| Durgesh    |   1022 |
+| Harsha     |   1043 |
+| Shreya     |   1057 |
+| Varun      |   1066 |
++------------+--------+
+
+mysql> select* from Loan;
++---------+-----------------+--------+
+| Loan_No | Branch_Name     | Amount |
++---------+-----------------+--------+
+|       3 | Ravivar Karanja |   2800 |
+|       4 | Gangapur Road   |  10000 |
+|       5 | Ravivar Karanja |   5000 |
+|       6 | Gangapur Road   |   2500 |
++---------+-----------------+--------+
+
+mysql> select* from Borrower;
++-----------+---------+
+| Cust_Name | Loan_No |
++-----------+---------+
+| Ankita    |       3 |
+| Harsha    |       4 |
+| Shreya    |       5 |
+| Ojaswini  |       6 |
++-----------+---------+
+
+====================================================================================================
+
+15. Delete all tuples at every branch located in Sharanpur road.
+----------------------------------------------------------------
+
+mysql> delete from Branch where Branch_Name='Sharanpur Road';
+
+mysql> select* from Branch;
++-----------------+-------------+--------+
+| Branch_Name     | Branch_City | Assets |
++-----------------+-------------+--------+
+| College Road    | Nasik       | aaa    |
+| Gangapur Road   | Nasik       | aaa    |
+| Indira Nagar    | Nasik       | aaa    |
+| Nasik Road      | Nasik       | aaa    |
+| Ravivar Karanja | Nasik       | aaa    |
++-----------------+-------------+--------+
+
+mysql> select* from Account;
++--------+-----------------+---------+
+| Acc_No | Branch_Name     | Balance |
++--------+-----------------+---------+
+|   1001 | Gangapur Road   | 1010.55 |
+|   1022 | Gangapur Road   | 2400.88 |
+|   1043 | Gangapur Road   | 23780.3 |
+|   1057 | Ravivar Karanja | 23260.6 |
+|   1290 | Ravivar Karanja |  760.55 |
+|   1330 | Indira Nagar    |  560.55 |
+|   1400 | Gangapur Road   |  760.55 |
++--------+-----------------+---------+
+
+mysql> select* from Customer;
++------------+---------------+-----------+
+| Cust_Name  | Cust_Street   | Cust_City |
++------------+---------------+-----------+
+| Ankita     | Deolali Camp  | Nasik     |
+| Atharva    | Gangapur Road | Nasik     |
+| Durgesh    | Pavan Nagar   | Nasik     |
+| Harsha     | Canada Corner | Nasik     |
+| Ojaswini   | College Road  | Nasik     |
+| Sharvari   | Golf club     | Nasik     |
+| Shreya     | Indira Nagar  | Nasik     |
+| Uddesh     | Amrutdham     | Nasik     |
+| Varun      | Trimbak Road  | Nasik     |
+| Yashashree | Rane Nagar    | Nasik     |
++------------+---------------+-----------+
+
+mysql> select* from Depositor;
++------------+--------+
+| Cust_Name  | Acc_No |
++------------+--------+
+| Atharva    |   1001 |
+| Ankita     |   1290 |
+| Yashashree |   1330 |
+| Ojaswini   |   1400 |
+| Durgesh    |   1022 |
+| Harsha     |   1043 |
+| Shreya     |   1057 |
++------------+--------+
+
+mysql> select* from Loan;
++---------+-----------------+--------+
+| Loan_No | Branch_Name     | Amount |
++---------+-----------------+--------+
+|       3 | Ravivar Karanja |   2800 |
+|       4 | Gangapur Road   |  10000 |
+|       5 | Ravivar Karanja |   5000 |
+|       6 | Gangapur Road   |   2500 |
++---------+-----------------+--------+
+
+mysql> select* from Borrower;
++-----------+---------+
+| Cust_Name | Loan_No |
++-----------+---------+
+| Ankita    |       3 |
+| Harsha    |       4 |
+| Shreya    |       5 |
+| Ojaswini  |       6 |
++-----------+---------+
+
+====================================================================================================

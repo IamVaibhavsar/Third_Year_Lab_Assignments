@@ -1,0 +1,25 @@
+{
+    "Employee": [
+        {
+            "id": 1,
+            "name": "vaibhav",
+            "designation": "Developer",
+            "salary": 45000,
+            "hobbies": [
+                "playing Cricket",
+                "chess"
+            ]
+        },
+        {
+            "id": 56,
+            "name": "suyash",
+            "designation": "android dev",
+            "salary": 56000,
+            "hobbies": [
+                "cricket,",
+                "meme"
+            ]
+        }
+    ]
+}
+

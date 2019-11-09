@@ -1,0 +1,234 @@
+ASSIGNMENT NO: 08
+---------------------------------------------------------------------------------------------
+ Create two tables
+	 O_Roll(Rollno,Name,DOB,Phone,address)
+         N_Roll(Rollno,Name,DOB,Phone,address)
+
+Write a PLSQL block using  various types of cursor(implicit,Explicit,For, Parameterized) to merge records from O_Roll table with that of N_Roll in such a way duplicate records are to be eliminated.
+
+Software Required: Ubuntu,Postgres.
+
+---------------------------------------------------------------------------------------------
+unix@unix-HP-dx2480-MT-KL969AV:~$ sudo -i -u postgres
+[sudo] password for unix: 
+postgres@unix-HP-dx2480-MT-KL969AV:~$ psql
+psql (9.5.2)
+Type "help" for help.
+
+
+postgres=# create database teb;
+CREATE DATABASE
+
+
+postgres=# \c teb;
+You are now connected to database "teb" as user "postgres".
+
+teb=# create table o_roll(roll int,name varchar(20),dob date,phone int,address varchar(20));
+CREATE TABLE
+teb=# create table n_roll(roll int,name varchar(20),dob date,phone int,address varchar(20));
+CREATE TABLE
+
+teb=# \dt
+         List of relations
+ Schema |  Name  | Type  |  Owner   
+--------+--------+-------+----------
+ public | n_roll | table | postgres
+ public | o_roll | table | postgres
+(2 rows)
+
+teb=# CREATE OR REPLACE FUNCTION ins(roll integer , name varchar(20),dob date,phone integer,address varchar(20)) 
+RETURNS void as $$
+BEGIN
+     	insert into o_roll values(roll,name,dob,phone,address);
+END; 
+
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION
+
+
+teb=# select ins(1,'Akansha','1998-09-24',9028,'Nasik');
+ ins 
+-----
+ 
+(1 row)
+
+teb=# select ins(4,'Aarav','1998-02-12',9086,'Mumbai');
+ ins 
+-----
+ 
+(1 row)
+
+teb=# select ins(1,'Raj','1998-12-12',9652,'Pune');
+ ins 
+-----
+ 
+(1 row)
+
+teb=# select ins(2,'Heer','1998-12-8',8952,'Chennai');
+ ins 
+-----
+ 
+(1 row)
+
+teb=# select ins(3,'Ram','1998-8-8',8882,'Kolkata');
+ ins 
+-----
+ 
+(1 row)
+
+teb=# select *from o_roll;
+ roll |  name   |    dob     | phone | address 
+------+---------+------------+-------+---------
+    1 | Akansha | 1998-09-24 |  9028 | Nasik
+    4 | Aarav   | 1998-02-12 |  9086 | Mumbai
+    1 | Raj     | 1998-12-12 |  9652 | Pune
+    2 | Heer    | 1998-12-08 |  8952 | Chennai
+    3 | Ram     | 1998-08-08 |  8882 | Kolkata
+(5 rows)
+
+teb=# CREATE OR REPLACE FUNCTION ins1(roll integer , name varchar(20),dob date,phone integer,address varchar(20)) 
+RETURNS void as $$
+BEGIN
+     	insert into n_roll values(roll,name,dob,phone,address);
+END; 
+
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+
+teb=# select ins1(5,'Raksha','1998-7-2',8752,'Mumbai');
+ ins1 
+------
+ 
+(1 row)
+
+teb=# select *from n_roll;
+ roll |  name  |    dob     | phone | address 
+------+--------+------------+-------+---------
+    5 | Raksha | 1998-07-02 |  8752 | Mumbai
+(1 row)
+
+
+                                                                       
+teb=# CREATE OR REPLACE function merge() returns void as
+$$
+DECLARE
+
+flag integer;
+orow o_roll%rowtype;
+nrow n_roll%rowtype;
+
+mycursor CURSOR for SELECT * from o_roll;
+
+BEGIN
+
+	OPEN mycursor;
+
+	for orow in SELECT * from o_roll
+	LOOP
+
+	for nrow in SELECT * from n_roll
+	LOOP
+
+	IF nrow.roll!=orow.roll THEN
+		flag:=1;
+		continue;
+		
+	ELSE
+			flag:=0;
+			EXIT;
+		END IF;
+	END LOOP;
+	
+	
+	IF flag=1 THEN
+	insert into n_roll values(orow.roll,orow.name,orow.dob,orow.phone,orow.address);
+	END IF;
+	
+	END LOOP;
+		
+	CLOSE mycursor;
+END	
+$$ language PLPGSQL;
+CREATE FUNCTION
+
+teb=# select merge();
+ merge 
+-------
+ 
+(1 row)
+
+teb=# select *from n_roll;
+ roll |  name   |    dob     | phone | address 
+------+---------+------------+-------+---------
+    5 | Raksha  | 1998-07-02 |  8752 | Mumbai
+    1 | Akansha | 1998-09-24 |  9028 | Nasik
+    4 | Aarav   | 1998-02-12 |  9086 | Mumbai
+    2 | Heer    | 1998-12-08 |  8952 | Chennai
+    3 | Ram     | 1998-08-08 |  8882 | Kolkata
+(5 rows)
+
+=============================================================================================
+CODE:
+------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ins(roll integer , name varchar(20),dob date,phone integer,address varchar(20)) 
+RETURNS void as $$
+BEGIN
+     	insert into o_roll values(roll,name,dob,phone,address);
+END; 
+
+$$ LANGUAGE plpgsql;
+
+
+
+------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ins1(roll integer , name varchar(20),dob date,phone integer,address varchar(20)) 
+RETURNS void as $$
+BEGIN
+     	insert into n_roll values(roll,name,dob,phone,address);
+END; 
+
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------------------------
+CREATE OR REPLACE function merge() returns void as
+$$
+DECLARE
+
+flag integer;
+orow o_roll%rowtype;
+nrow n_roll%rowtype;
+
+mycursor CURSOR for SELECT * from o_roll;
+
+BEGIN
+
+	OPEN mycursor;
+
+	for orow in SELECT * from o_roll
+	LOOP
+
+	for nrow in SELECT * from n_roll
+	LOOP
+
+	IF nrow.roll!=orow.roll THEN
+		flag:=1;
+		continue;
+		
+	ELSE
+			flag:=0;
+			EXIT;
+		END IF;
+	END LOOP;
+	
+	
+	IF flag=1 THEN
+	insert into n_roll values(orow.roll,orow.name,orow.dob,orow.phone,orow.address);
+	END IF;
+	
+	END LOOP;
+		
+	CLOSE mycursor;
+END	
+$$ language PLPGSQL;
+==============================================================================================

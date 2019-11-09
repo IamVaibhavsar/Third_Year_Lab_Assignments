@@ -1,0 +1,82 @@
+NAME: VAIBHAV BHAVSAR
+TE-B
+ROLL NO: 08
+ASSIGNMENT NO 11: 
+implement the following MongoDb Query
+    1. Create a collection named books.
+    2. Insert 5 records with field TITLE,DESCRIPTION,BY,URL,TAGS AND LIKES
+    3. Insert 1 more document in collection with additional field of user name and comments.
+    4. Display all the documents whose title is 'mongodb'.
+    5. Display all the documents written by 'john' or whose title is 'mongodb'.
+    6. Display all the documents whose title is 'mongodb' and written by 'john'.
+    7. Display all the documents whose like is greater than 10.
+    8. Display all the documents whose like is greater than 100 and whose title is either 'mongodb' or written by 'john'.
+    9. Update the title of 'mongodb' document to 'mongodb overview'
+    10. Delete the document titled 'nosql overview'.
+    11. Display exactly two documents written by 'john'.
+    12. Display the second document published by 'john'.
+    13. Display all the books in the sorted fashion.
+    14. Insert a document using save method.
+'''
+
+q3===
+db.books.insert({
+   title: 'xyzc',
+user_name:'harsh5',
+comments:'terror5', 
+   description: 'MongoDB is no sql database5',
+   by: 'tutorials point5',
+   url: 'http://www.tutorialspoint5.com',
+   tags: ['mongodb5', 'database5', 'NoSQL5'],
+   likes: 1005
+})
+
+q4===
+db.books.find({"title":"xyz"}).pretty()
+
+q5===
+db.books.find({$or:[{"title":"xyza"},{"by": "tutorials point4"}]}).pretty()
+
+q6===
+db.books.find({$and:[{"title":"xyzc"},{"by": "tutorials point4"}]}).pretty()
+
+q7===
+db.books.find({"likes":{$gt:1000}}).pretty()
+
+q8===
+db.books.find({"likes": {$gt:1003}, $or: [{"by": "tutorials point4"},
+   {"title": "xyzc"}]}).pretty()
+
+q9===
+db.books.update({'title':'xyz'},{$set:{'title':'pqr'}})
+
+q10===
+db.books.remove({'title':'pqr'})
+
+q11===
+db.books.find({"title":"xyzc"}).pretty().limit(2)
+
+q12==
+db.books.find({"title":"xyzc"}).pretty().limit(1).skip(1)
+
+q13==
+db.books.find({},{"likes":1}).sort({"likes":-1})  		-----Descending order
+
+db.books.find({},{"likes":1}).sort({"likes":1})  		-----Ascending order
+
+q14==
+db.books.save({
+   title: 'xyzc6',
+user_name:'harsh6',
+comments:'terror6', 
+   description: 'MongoDB is no sql database6',
+   by: 'tutorials point6',
+   url: 'http://www.tutorialspoint6.com',
+   tags: ['mongodb6', 'database6', 'NoSQL6'],
+   likes: 1006
+})
+
+
+
+
+

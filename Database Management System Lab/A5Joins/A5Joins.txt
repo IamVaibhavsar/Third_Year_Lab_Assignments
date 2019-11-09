@@ -1,0 +1,173 @@
+Name    : Vaibhav Bhavsar
+Class   : TE-B
+Roll No : 08
+====================================================================================================================
+
+Assignment : 5
+--------------------------------------------------------------------------------------------------------------------
+
+Consider the given database schema: 
+Student(Student_Id,Student_Name,Instructor_Id,Student_City)
+Instructor(Instructor_Id,Instructor_Name,Instructor_City,Specialization)
+
++---------------+-----------------+-----------------+----------------+
+| Instructor_Id | Instructor_Name | Instructor_City | Specialization |
++---------------+-----------------+-----------------+----------------+
+|          2570 | AVT             | Nashik          | SEPM           |
+|          2571 | CSP             | Nashik          | DBMS           |
+|          2572 | SAG             | Pune            | FPL            |
+|          2573 | SKG             | Pune            | ADS            |
+|          2574 | CRP             | Mumbai          | DSA            |
+|          2575 | NMP             | Aurabgabad      | COA            |
+|          2576 | SPS             | Pune            | COMPUTER       |
+|          2577 | SKC             | Nashik          | SEPM           |
+|          2578 | DMK             | Mumbai          | SDL            |
+|          2579 | MNS             | Aurangabad      | CN             |
+|          2580 | LAP             | Nashik          | SDL            |
+|          2581 | SSS             | Mumbai          | DBMS           |
+|          2582 | MPM             | Aurangabad      | MP             |
+|          2583 | GRG             | Pune            | TOC            |
+|          2584 | PPV             | Mumbai          | OOP            |
++---------------+-----------------+-----------------+----------------+
+
++------------+--------------+---------------+--------------+
+| Student_Id | Student_Name | Instructor_Id | Student_City |
++------------+--------------+---------------+--------------+
+|       1001 | Ankita       |          2579 | Nashik       |
+|       1002 | Abiali       |          2584 | Nashik       |
+|       1003 | Atharva      |          2574 | Pune         |
+|       1004 | Uddesh       |          2580 | Pune         |
+|       1005 | Andrew       |          2571 | Mumbai       |
+|       1006 | Shubham      |          2576 | Mumbai       |
+|       1007 | Rupesh       |          2573 | Nagpur       |
+|       1008 | Rashi        |          2572 | Nagpur       |
+|       1009 | Varun        |          2574 | Nashik       |
+|       1010 | Sagar        |          2576 | Pune         |
+|       1011 | Rohan        |          2580 | Pune         |
+|       1012 | Prajakta     |          2581 | Aurangabad   |
+|       1013 | Diksha       |          2576 | Pune         |
+|       1014 | Mayur        |          NULL | Nashik       |
+|       1015 | Swapnil      |          NULL | Pune         |
+|       1016 | Sonika       |          NULL | Nagpur       |
++------------+--------------+---------------+--------------+
+
+
+
+====================================================================================================================
+
+1. Find the instructor of each student.
+--------------------------------------------------------------------------------------------------------------------
+
+mysql> select Student_Name,Instructor_Name from Student,Instructor where Instructor.Instructor_Id=Student.Instructor_Id 
+and Student.Instructor_Id is null union select Instructor_Name,Student_Name from Instructor,Student where Instructor.Instructor_Id=Student.Instructor_Id;
+
++--------------+-----------------+
+| Student_Name | Instructor_Name |
++--------------+-----------------+
+| MNS          | Ankita          |
+| PPV          | Abiali          |
+| CRP          | Atharva         |
+| LAP          | Uddesh          |
+| CSP          | Andrew          |
+| SPS          | Shubham         |
+| SKG          | Rupesh          |
+| SAG          | Rashi           |
+| CRP          | Varun           |
+| SPS          | Sagar           |
+| LAP          | Rohan           |
+| SSS          | Prajakta        |
+| SPS          | Diksha          |
++--------------+-----------------+
+
+===================================================================================================================
+
+2. Find the student who is not having any instructor.
+-------------------------------------------------------------------------------------------------------------------
+
+mysql> select Student_Name from Student where Student_Name not in(select Student_Name from Student natural join Instructor);
+
++--------------+
+| Student_Name |
++--------------+
+| Mayur        |
+| Swapnil      |
+| Sonika       |
++--------------+
+
+mysql> select Student_Name from Student where Instructor_Id is null;
+
++--------------+
+| Student_Name |
++--------------+
+| Mayur        |
+| Swapnil      |
+| Sonika       |
++--------------+
+
+===================================================================================================================
+
+3. Find the student who is not having any instructor as well as instructor who is not having student.
+--------------------------------------------------------------------------------------------------------------------
+
+mysql> 
+select Student_Name,Instructor_Name 
+from Student left outer join Instructor on Student.Instructor_Id=Instructor.Instructor_Id 
+where Instructor_Name is NULL 
+union  
+select Student_Name,Instructor_Name 
+from Student right outer join Instructor on Student.Instructor_Id=Instructor.Instructor_Id 
+where Student_Name is NULL; 
+
++--------------+-----------------+
+| Student_Name | Instructor_Name |
++--------------+-----------------+
+| Jayashree    | NULL            |
+| Swapnil      | NULL            |
+| Sonika       | NULL            |
+| NULL         | AVT             |
+| NULL         | NMP             |
+| NULL         | SKC             |
+| NULL         | DMK             |
+| NULL         | MPM             |
+| NULL         | GRG             |
++--------------+-----------------+
+
+===================================================================================================================
+
+4. Find the students whose instructor’s specialization is computer.
+-------------------------------------------------------------------------------------------------------------------
+
+mysql> 
+select Student_Name 
+from Student natural join Instructor 
+where Specialization='COMPUTER';
+
++--------------+
+| Student_Name |
++--------------+
+| Shubham      |
+| Sagar        |
+| Diksha       |
++--------------+
+
+===================================================================================================================
+
+5. Create a view containing total number of students whose instructor belongs to “Pune”.
+-------------------------------------------------------------------------------------------------------------------
+
+mysql> create view pune_stud as select Student_Id,Student_Name,Student_City from Student natural join Instructor where Instructor_City='Pune';
+
+mysql> select * from pune_stud;
+
++------------+--------------+--------------+
+| Student_Id | Student_Name | Student_City |
++------------+--------------+--------------+
+|       1006 | Ojaswini     | Mumbai       |
+|       1007 | Rupesh       | Nagpur       |
+|       1008 | Rashi        | Nagpur       |
+|       1010 | Sagar        | Pune         |
+|       1013 | Diksha       | Pune         |
++------------+--------------+--------------+
+
+===================================================================================================================
+

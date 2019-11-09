@@ -1,0 +1,375 @@
+
+Create a database with following schemas
+Borrower(Rollin, Name, DateofIssue, NameofBook, Status) 
+Fine(Roll_no,Date,Amt) 
+1. Write a pgSQL block to accept  input for Borrower table. 
+2. Write a pgSQL block  using control structures to calculate fine by using the following rules:
+           a. check the number of days (from date of issue), if days are between 15 to 30 then fine amount will be Rs 5per day  
+          b. If no. of days>30, per day fine will be Rs 50 per day
+          c.  for days less than 30, Rs. 5 per day. 
+ After submitting the book, status will change from I to R.  If condition of fine is true, then details will be stored into fine table.
+ 
+Software Required: Ubuntu,Postgres.
+
+---------------------------------------------------------------------------------------------
+
+unix@unix-HP-dx2480-MT-KL969AV:~$ sudo -i -u postgres
+[sudo] password for unix: 
+postgres@unix-HP-dx2480-MT-KL969AV:~$ psql
+psql (9.5.2)
+Type "help" for help.
+
+postgres=# \l
+                             List of databases
+   Name    |  Owner   | Encoding | Collate | Ctype |   Access privileges   
+-----------+----------+----------+---------+-------+-----------------------
+ book      | postgres | UTF8     | en_IN   | en_IN | 
+ db        | postgres | UTF8     | en_IN   | en_IN | 
+ postgres  | postgres | UTF8     | en_IN   | en_IN | 
+ psql      | postgres | UTF8     | en_IN   | en_IN | 
+ sample    | postgres | UTF8     | en_IN   | en_IN | 
+ school    | postgres | UTF8     | en_IN   | en_IN | 
+ te_70     | postgres | UTF8     | en_IN   | en_IN | 
+ teb70     | postgres | UTF8     | en_IN   | en_IN | 
+ template0 | postgres | UTF8     | en_IN   | en_IN | =c/postgres          +
+           |          |          |         |       | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_IN   | en_IN | =c/postgres          +
+           |          |          |         |       | postgres=CTc/postgres
+(10 rows)
+
+postgres=# \dt
+          List of relations
+ Schema |   Name   | Type  |  Owner   
+--------+----------+-------+----------
+ public | borrower | table | postgres
+ public | employee | table | postgres
+ public | fine     | table | postgres
+(3 rows)
+
+sample=# \c book
+You are now connected to database "book" as user "postgres".
+
+book=# create table Borrower(Roll_id int, Name varchar(20), DateofIssue date, NameofBook varchar(20), Status varchar(5));
+CREATE TABLE
+ 
+book=# CREATE OR REPLACE FUNCTION insertborrower (Roll_id integer , Name varchar(20),DateofIssue date,NameofBook varchar(20),Status varchar(5)) RETURNS void as $$
+BEGIN
+     insert into Borrower values (Roll_id,Name,DateofIssue,NameofBook,Status);
+END; 
+
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION
+
+
+
+book=# select insertborrower(1,'Rashi','12/08/2018','DBMS','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(2,'Anjali','09/28/2018','TOC','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(3,'Rashmi','09/23/2018','CN','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(4,'Jay','08/03/2018','SDL','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(5,'Sharvari','07/23/2018','ISEE','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(6,'Ankita','06/13/2018','PLSQL','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(7,'Ravina','09/13/2018','SQL','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(7,'Ravina','09/13/2018','Data','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select insertborrower(8,'Vimala','06/13/2018','DataScience','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select *from borrower;
+ roll_id |   name   | dateofissue | nameofbook  | status 
+---------+----------+-------------+-------------+--------
+       1 | Rashi    | 2018-12-08  | DBMS        | I
+       2 | Anjali   | 2018-09-28  | TOC         | I
+       3 | Rashmi   | 2018-09-23  | CN          | I
+       4 | Jay      | 2018-08-03  | SDL         | I
+       5 | Sharvari | 2018-07-23  | ISEE        | I
+       6 | Ankita   | 2018-06-13  | PLSQL       | I
+       7 | Ravina   | 2018-09-13  | SQL         | I
+       7 | Ravina   | 2018-09-13  | Data        | I
+       8 | Vimala   | 2018-06-13  | DataScience | I
+(9 rows)
+
+book=# create table Fine(Roll int,current_date1 date,fine int);
+CREATE TABLE
+
+
+book=# \CREATE OR REPLACE FUNCTION calfine (Roll integer) RETURNS void as $$
+DECLARE
+retdate date;
+issuedate date;
+nod integer;
+current_date1 date;
+fine5 integer := 5;
+fine50 integer := 50;
+fine integer;
+BEGIN
+     execute'select dateofissue from Borrower where Roll_id=$1' into issuedate using Roll;
+     raise notice 'issue date%',issuedate;
+     current_date1 := now(); 
+     nod := current_date1 - issuedate;
+     raise notice 'nod%',nod;
+     IF nod > 30 THEN
+     	fine := fine50*nod;
+     	insert into Fine values (Roll,current_date1,fine);
+  	UPDATE Borrower set status = 'R' WHERE Roll_id = Roll;
+     ELSIF nod < 30 THEN
+     	fine :=fine5*nod;
+     	insert into Fine values (Roll,current_date1,fine);
+     	UPDATE Borrower set status = 'R' WHERE Roll_id = Roll;
+     END IF;
+     	
+     
+END; 
+
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+
+book=# select calfine(1);
+NOTICE:  issue date2018-12-08
+NOTICE:  nod-66
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select *from borrower;
+ roll_id |   name   | dateofissue | nameofbook  | status 
+---------+----------+-------------+-------------+--------
+       2 | Anjali   | 2018-09-28  | TOC         | I
+       3 | Rashmi   | 2018-09-23  | CN          | I
+       4 | Jay      | 2018-08-03  | SDL         | I
+       5 | Sharvari | 2018-07-23  | ISEE        | I
+       6 | Ankita   | 2018-06-13  | PLSQL       | I
+       7 | Ravina   | 2018-09-13  | SQL         | I
+       7 | Ravina   | 2018-09-13  | Data        | I
+       8 | Vimala   | 2018-06-13  | DataScience | I
+       1 | Rashi    | 2018-12-08  | DBMS        | R
+(9 rows)
+
+book=# select *from fine;
+ roll | current_date1 | fine 
+------+---------------+------
+    1 | 2018-10-03    | -330
+(1 row)
+
+book=# select calfine(2);
+NOTICE:  issue date2018-09-28
+NOTICE:  nod5
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select *from fine;
+ roll | current_date1 | fine 
+------+---------------+------
+    1 | 2018-10-03    | -330
+    2 | 2018-10-03    |   25
+(2 rows)
+
+
+book=# select calfine(3);
+NOTICE:  issue date2018-09-23
+NOTICE:  nod10
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select calfine(4);
+NOTICE:  issue date2018-08-03
+NOTICE:  nod61
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select calfine(5);
+NOTICE:  issue date2018-07-23
+NOTICE:  nod72
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select calfine(6);
+NOTICE:  issue date2018-06-13
+NOTICE:  nod112
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select calfine(7);
+NOTICE:  issue date2018-09-13
+NOTICE:  nod20
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select calfine(8);
+NOTICE:  issue date2018-06-13
+NOTICE:  nod112
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select *from fine;
+ roll | current_date1 | fine 
+------+---------------+------
+    1 | 2018-10-03    | -330
+    2 | 2018-10-03    |   25
+    3 | 2018-10-03    |   50
+    4 | 2018-10-03    | 3050
+    5 | 2018-10-03    | 3600
+    6 | 2018-10-03    | 5600
+    7 | 2018-10-03    |  100
+    8 | 2018-10-03    | 5600
+(8 rows)
+
+book=# book=# select insertborrower(8,'Vimala','04/23/2018','Science','I');
+ insertborrower 
+----------------
+ 
+(1 row)
+
+book=# select *from borrower;
+ roll_id |   name   | dateofissue | nameofbook  | status 
+---------+----------+-------------+-------------+--------
+       1 | Rashi    | 2018-12-08  | DBMS        | R
+       2 | Anjali   | 2018-09-28  | TOC         | R
+       3 | Rashmi   | 2018-09-23  | CN          | R
+       4 | Jay      | 2018-08-03  | SDL         | R
+       5 | Sharvari | 2018-07-23  | ISEE        | R
+       6 | Ankita   | 2018-06-13  | PLSQL       | R
+       7 | Ravina   | 2018-09-13  | SQL         | R
+       7 | Ravina   | 2018-09-13  | Data        | R
+       8 | Vimala   | 2018-06-13  | DataScience | R
+       8 | Vimala   | 2018-04-23  | Science     | I
+(10 rows)
+
+book=# select calfine(8);
+NOTICE:  issue date2018-06-13
+NOTICE:  nod112
+ calfine 
+---------
+ 
+(1 row)
+
+book=# select *from fine;
+ roll | current_date1 | fine 
+------+---------------+------
+    1 | 2018-10-03    | -330
+    2 | 2018-10-03    |   25
+    3 | 2018-10-03    |   50
+    4 | 2018-10-03    | 3050
+    5 | 2018-10-03    | 3600
+    6 | 2018-10-03    | 5600
+    7 | 2018-10-03    |  100
+    8 | 2018-10-03    | 5600
+    8 | 2018-10-03    | 5600
+(9 rows)
+
+book=# select *from borrower;
+ roll_id |   name   | dateofissue | nameofbook  | status 
+---------+----------+-------------+-------------+--------
+       1 | Rashi    | 2018-12-08  | DBMS        | R
+       2 | Anjali   | 2018-09-28  | TOC         | R
+       3 | Rashmi   | 2018-09-23  | CN          | R
+       4 | Jay      | 2018-08-03  | SDL         | R
+       5 | Sharvari | 2018-07-23  | ISEE        | R
+       6 | Ankita   | 2018-06-13  | PLSQL       | R
+       7 | Ravina   | 2018-09-13  | SQL         | R
+       7 | Ravina   | 2018-09-13  | Data        | R
+       8 | Vimala   | 2018-06-13  | DataScience | R
+       8 | Vimala   | 2018-04-23  | Science     | R
+(10 rows)
+
+book=# 
+=============================================================================================
+CODE:
+-------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION calfine (Roll integer) RETURNS void as $$
+DECLARE
+retdate date;
+issuedate date;
+nod integer;
+current_date1 date;
+fine5 integer := 5;
+fine50 integer := 50;
+fine integer;
+BEGIN
+     execute'select dateofissue from Borrower where Roll_id=$1' into issuedate using Roll;
+     raise notice 'issue date%',issuedate;
+     current_date1 := now(); 
+     nod := current_date1 - issuedate;
+     raise notice 'nod%',nod;
+     IF nod > 30 THEN
+     	fine := fine50*nod;
+     	insert into Fine values (Roll,current_date1,fine);
+  	UPDATE Borrower set status = 'R' WHERE Roll_id = Roll;
+     ELSIF nod < 30 THEN
+     	fine :=fine5*nod;
+     	insert into Fine values (Roll,current_date1,fine);
+     	UPDATE Borrower set status = 'R' WHERE Roll_id = Roll;
+     END IF;
+     	
+     
+END; 
+
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION insertborrower (Roll_id integer , Name varchar(20),DateofIssue date,NameofBook varchar(20),Status varchar(5)) RETURNS void as $$
+BEGIN
+     insert into Borrower values (Roll_id,Name,DateofIssue,NameofBook,Status);
+END; 
+
+$$ LANGUAGE plpgsql;
+
+===============================================================================================
+

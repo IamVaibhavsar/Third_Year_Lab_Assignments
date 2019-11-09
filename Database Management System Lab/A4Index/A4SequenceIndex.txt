@@ -1,0 +1,118 @@
+Name    : Vaibhav Bhavsar
+Class   : TE-B
+Roll No : 08
+====================================================================================================================
+
+Assignment no: 4
+-----------------------------------------------------------------------------------------------
+Consider the given relational table: 
+	Employee(Emp_No,Emp_Name,Designation,City,Salary,Zipcode,County)
+
+1. Creates a sequence used to generate employee numbers for the empno column of the emp table.
+2. Create an Index on county.
+3. Find the zipcode whose county = 071 and check whether the query uses the Index and write your  observation.
+4. Create a view for employees having salary <50000 and stays in 'Mumbai'
+Software Required: MySQL ,Ubuntu
+
+================================================================================================
+
+1. Create a sequence used to generate Employee numbers for the Emp_No column of the Employee table.
+.............................................................................................
+
+mysql>create table Employee(Emp_No int(3) primary key auto_increment,Emp_Name varchar(10),Designation varchar(15),City varchar(10),Salary float(5),Zipcode int(6),County int(3));
+mysql> alter table Employee auto_increment=100;
+
++--------+------------+--------------+--------+--------+---------+--------+
+| Emp_No | Emp_Name   | Designation  | City   | Salary | Zipcode | County |
++--------+------------+--------------+--------+--------+---------+--------+
+|    100 | Ruhaan     | CEO          | Mumbai |  40000 |  400030 |     75 |
+|    101 | Atharva    | Director     | Pune   |  39000 |  411001 |     71 |
+|    102 | Sharvari   | Manager      | Nasik  |  35000 |  422002 |     65 |
+|    103 | Siddhi     | Founder      | Mumbai |  45000 |  400002 |     62 |
+|    104 | Vijaylaxmi | Team Leader  | Pune   |  37000 |  411013 |     67 |
+|    105 | Rohini     | Project Head | Pune   |  38000 |  411013 |     67 |
+|    106 | Priyanka   | Testing Head | Nagpur |  40000 |  402010 |     64 |
+|    107 | Jayashree  | Developer    | Nagpur |  45000 |  402010 |     64 |
++--------+------------+--------------+--------+--------+---------+--------+
+
+=================================================================================================
+mysql> insert into Employee(Emp_No,Emp_Name,Designation,City,Salary,Zipcode,County) values(291,'Rashi','Developer','Nagpur',45000.0,402010,064);
+
++--------+------------+--------------+--------+--------+---------+--------+
+| Emp_No | Emp_Name   | Designation  | City   | Salary | Zipcode | County |
++--------+------------+--------------+--------+--------+---------+--------+
+|    100 | Ruhaan     | CEO          | Mumbai |  40000 |  400030 |     75 |
+|    101 | Atharva    | Director     | Pune   |  39000 |  411001 |     71 |
+|    102 | Sharvari   | Manager      | Nasik  |  35000 |  422002 |     65 |
+|    103 | Siddhi     | Founder      | Mumbai |  45000 |  400002 |     62 |
+|    104 | Vijaylaxmi | Team Leader  | Pune   |  37000 |  411013 |     67 |
+|    105 | Rohini     | Project Head | Pune   |  38000 |  411013 |     67 |
+|    106 | Priyanka   | Testing Head | Nagpur |  40000 |  402010 |     64 |
+|    107 | Jayashree  | Developer    | Nagpur |  45000 |  402010 |     64 |
+|    291 | Rashi      | Developer    | Nagpur |  45000 |  402010 |     64 |
++--------+------------+--------------+--------+--------+---------+--------+
+
+
+mysql> insert into Employee(Emp_Name,Designation,City,Salary,Zipcode,County) values('Prajakta','Team Leader','Pune',40000.0,400030,075);
+
++--------+------------+--------------+--------+--------+---------+--------+
+| Emp_No | Emp_Name   | Designation  | City   | Salary | Zipcode | County |
++--------+------------+--------------+--------+--------+---------+--------+
+|    100 | Ruhaan     | CEO          | Mumbai |  40000 |  400030 |     75 |
+|    101 | Atharva    | Director     | Pune   |  39000 |  411001 |     71 |
+|    102 | Sharvari   | Manager      | Nasik  |  35000 |  422002 |     65 |
+|    103 | Siddhi     | Founder      | Mumbai |  45000 |  400002 |     62 |
+|    104 | Vijaylaxmi | Team Leader  | Pune   |  37000 |  411013 |     67 |
+|    105 | Rohini     | Project Head | Pune   |  38000 |  411013 |     67 |
+|    106 | Priyanka   | Testing Head | Nagpur |  40000 |  402010 |     64 |
+|    107 | Jayashree  | Developer    | Nagpur |  45000 |  402010 |     64 |
+|    291 | Rashi      | Developer    | Nagpur |  45000 |  402010 |     64 |
+|    292 | Prajakta   | Team Leader  | Pune   |  40000 |  400030 |     75 |
++--------+------------+--------------+--------+--------+---------+--------+
+
+
+
+
+==================================================================================================================
+2. Create an Index on county.
+..........................................................................................
+mysql> create index County_Index on Employee(County);
+
+==================================================================================================================
+3. Find the zipcode whose county = 071 and check whether the query uses the Index and write your  observation.
+
+OBSERVATION:
+(EXECUTE BELOW QUERY BEFORE AND AFTER CREATING THE INDEX AND THE SPEED OF EXECUTION OF THE QUERY INCREASES BECAUSE OF INDEX.
+NUMBER OF ROWS TRAVERSED ARE DECREASED AND IT CAN BE SEEN USING THE EXPLAIN QUERY).
+
+mysql> explain select Zipcode from Employee where County=71;
+
+
++----+-------------+----------+------------+------+---------------+--------------+---------+-------+------+----------+-------+
+| id | select_type | table    | partitions | type | possible_keys | key          | key_len | ref   | rows | filtered | Extra |
++----+-------------+----------+------------+------+---------------+--------------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | Employee | NULL       | ref  | County_Index  | County_Index | 5       | const |    3 |   100.00 | NULL  |
++----+-------------+----------+------------+------+---------------+--------------+---------+-------+------+----------+-------+
+
+
+mysql> show indexes from Employee;
++----------+------------+--------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| Table    | Non_unique | Key_name     | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
++----------+------------+--------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| Employee |          0 | PRIMARY      |            1 | Emp_No      | A         |           9 |     NULL | NULL   |      | BTREE      |         |               |
+| Employee |          1 | County_Index |            1 | County      | A         |           7 |     NULL | NULL   | YES  | BTREE      |         |               |
++----------+------------+--------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+
+
+==================================================================================================================
+4. Create a view for employees having salary <50000 and stays in 'Mumbai'
+
+create view v1
+as select Emp_No ,Emp_Name ,Designation , Zipcode, County		(depends on which attributes you want in view)
+from Employee
+where Salary<50000 and City="Mumbai";
+
+select * from v1;
+
+
+==================================================================================================================

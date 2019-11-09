@@ -1,0 +1,71 @@
+NAME     : VAIBHAV BHAVSAR
+CLASS    : TE-B
+ROLL NO. : 08
+SUBJECT  : Database Management System Lab.
+Assignment no:12
+----------------------------------------------------------------------------------------------
+
+Create the collection Books having the following fields    TITLE, DESCRIPTION, BY, URL, TAGS AND LIKES.
+      Implement the following Aggregation and Indexing Queries 
+    1. Find the number of books published by john.
+    2. Find books which have minimum likes and maximum likes published by john.
+    3. Find the average number of likes of the books published by john.
+    4. Find the first and last book published by john..
+    5. Create an index on author name.
+Display the books published by john and check if it uses the index which we have created
+
+/*************************************************************************************************************************/
+
+FIND THE NUMBER OF BOOKS PUBLISHED BY JOHN
+
+> db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",no_of_documents:{$sum:1}}}])
+{ "_id" : "JOHN", "no_of_documents" : 2 }
+
+/**************************************************************************************************************************/
+
+FIND BOOKS WHICH HAVE MINIMUM LIKES AND MAXIMUM LIKES PUBLISHED BY JOHN
+
+> db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",minimum_likes:{$min:"$likes"}}}])
+{ "_id" : "JOHN", "minimum_likes" : 50 }
+
+> db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",minimum_likes:{$max:"$likes"}}}])
+{ "_id" : "JOHN", "minimum_likes" : 100 }
+
+/**************************************************************************************************************************/
+
+FIND THE AVERAGE NUMBER OF LIKES OF THE BOOKS PUBLISHED BY JOHN
+
+> db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",avg_likes:{$avg:"$likes"}}}])
+{ "_id" : "JOHN", "avg_likes" : 75 }
+
+/**************************************************************************************************************************/
+
+FIND THE FIRST AND LAST BOOK PUBLISHED BY JOHN
+
+db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",first_book:{$first:"$title"}}}])
+{ "_id" : "JOHN", "first_book" : "MONGO DB OVERVIEW" }
+
+> db.BOOKS.aggregate([{$match:{by:"JOHN"}},{$group:{_id:"$by",last_book:{$last:"$title"}}}])
+{ "_id" : "JOHN", "last_book" : "NOSQL" }
+
+/**************************************************************************************************************************/
+
+CREATE AN INDEX ON AUTHOR NAME
+
+> db.BOOKS.ensureIndex({"by":1})		
+{
+	"createdCollectionAutomatically" : false,
+	"numIndexesBefore" : 1,
+	"numIndexesAfter" : 2,
+	"ok" : 1
+}
+
+> db.BOOKS.createIndex({"by":1})		
+{
+	"createdCollectionAutomatically" : false,
+	"numIndexesBefore" : 1,
+	"numIndexesAfter" : 2,
+	"ok" : 1
+}
+
+/**************************************************************************************************************************/
